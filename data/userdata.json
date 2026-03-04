@@ -1,0 +1,27 @@
+{
+  "statuses": {
+    "arrays": "in_progress",
+    "linked-list": "done"
+  },
+  "notes": {
+    "arrays": "testing note",
+    "linked-list": "testing note 2"
+  },
+  "ratings": {
+    "arrays": 0,
+    "linked-list": 0,
+    "trees": 0,
+    "graphs": 0,
+    "dp": 0,
+    "heaps": 0,
+    "sorting": 0
+  },
+  "subtopicStatuses": {},
+  "timelineChecked": {},
+  "problems": [],
+  "interviews": [],
+  "meta": {
+    "lastUpdated": "2026-03-04T07:10:13.642Z",
+    "version": "1.0.0"
+  }
+}
