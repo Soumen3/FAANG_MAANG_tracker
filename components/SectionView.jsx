@@ -24,12 +24,38 @@ export default function SectionView({ sections, statuses, notes, ratings, subtop
       {filteredSections.map(sec => (
         <div key={sec.id} id={sec.id} style={{ marginBottom: '4rem' }}>
           {/* Section header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: '2rem' }}>
-            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.7rem', color: sec.accent, border: `1px solid ${sec.accent}50`, padding: '4px 10px', borderRadius: 4, letterSpacing: '0.12em' }}>{sec.num}</span>
-            <div style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span>{sec.icon}</span> {sec.title}
-            </div>
-            <div style={{ flex: 1, height: 1, background: 'linear-gradient(to right, #1e2d45, transparent)' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: '2rem' }}>
+            {/* index badge */}
+            <span style={{
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: '0.62rem', fontWeight: 700,
+              color: sec.accent,
+              background: `${sec.accent}12`,
+              border: `1px solid ${sec.accent}40`,
+              padding: '3px 10px', borderRadius: 4,
+              letterSpacing: '0.14em', flexShrink: 0,
+            }}>{sec.num}</span>
+
+            {/* icon */}
+            <span style={{ fontSize: '1.3rem', lineHeight: 1, flexShrink: 0 }}>{sec.icon}</span>
+
+            {/* title — clash display / wide caps */}
+            <h2 style={{
+              margin: 0,
+              fontFamily: '"Syne", "Clash Display", ui-sans-serif, sans-serif',
+              fontSize: 'clamp(1rem, 2.2vw, 1.35rem)',
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              background: `linear-gradient(90deg, #e2e8f0 0%, ${sec.accent} 100%)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              lineHeight: 1.1,
+            }}>{sec.title}</h2>
+
+            {/* divider */}
+            <div style={{ flex: 1, height: 1, background: `linear-gradient(to right, ${sec.accent}50, transparent)`, minWidth: 20 }} />
           </div>
 
           {/* Cards grid */}

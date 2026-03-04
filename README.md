@@ -1,4 +1,4 @@
-# 🚀 FAANG/MAANG Roadmap Tracker — Next.js
+# 🚀 MAMAA Roadmap Tracker — Next.js
 
 Built with **Next.js + JavaScript**. No external database. No cloud service. All your data lives in `data/userdata.json` inside the project folder — read and written directly by Next.js API routes.
 
@@ -7,7 +7,7 @@ Built with **Next.js + JavaScript**. No external database. No cloud service. All
 ## 🏗️ Project Structure
 
 ```
-faang-nextjs/
+mamaa-nextjs/
 ├── pages/
 │   ├── index.js              ← Main app (React UI)
 │   ├── _app.js               ← Global styles
@@ -91,7 +91,7 @@ npm run build
 npm start          # runs on port 3000
 
 # Or with PM2:
-pm2 start npm --name "faang-tracker" -- start
+pm2 start npm --name "mamaa-tracker" -- start
 ```
 
 ### ⚠️ Vercel / Netlify — file writes DON'T persist

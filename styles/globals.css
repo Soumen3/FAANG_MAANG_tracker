@@ -1,14 +1,14 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  background: #050810;
+  background: #020408;
   color: #e2e8f0;
   font-family: 'Syne', sans-serif;
   overflow-x: hidden;
 }
 ::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #0c1020; }
-::-webkit-scrollbar-thumb { background: #1e2d45; border-radius: 3px; }
+::-webkit-scrollbar-track { background: #060a14; }
+::-webkit-scrollbar-thumb { background: #16243a; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #00f5d4; }
 input, textarea, select { color-scheme: dark; font-family: inherit; }
 button { font-family: inherit; }
@@ -21,4 +21,8 @@ a { color: inherit; }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
 }

@@ -7,6 +7,16 @@ export default function TopicCard({ topic, status, note, rating, subtopicStatuse
   const [expanded, setExpanded] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [localNote, setLocalNote] = useState(note || '');
+  const [hovered, setHovered] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    });
+  };
 
   const diff = DIFFICULTY[topic.difficulty];
   const currentStatus = STATUS_CONFIG[status || 'not_started'];
@@ -26,29 +36,45 @@ export default function TopicCard({ topic, status, note, rating, subtopicStatuse
   };
 
   return (
-    <div style={{
-      background: '#111827',
-      border: `1px solid ${status && status !== 'not_started' ? currentStatus.border : '#1e2d45'}`,
-      borderRadius: 16,
-      padding: '1.5rem',
-      position: 'relative',
-      overflow: 'hidden',
-      transition: 'all 0.35s cubic-bezier(0.23,1,0.32,1)',
-      boxShadow: status === 'done' ? `0 0 30px rgba(52,211,153,0.08)` : 'none',
-    }}>
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onMouseMove={handleMouseMove}
+      style={{
+        background: '#111827',
+        border: `1px solid ${hovered ? `rgba(${hexToRgb(accent)}, 0.55)` : status && status !== 'not_started' ? currentStatus.border : '#1e2d45'}`,
+        borderRadius: 16,
+        padding: '1.5rem',
+        position: 'relative',
+        overflow: 'hidden',
+        transition: 'border-color 0.3s, box-shadow 0.3s',
+        boxShadow: hovered
+          ? `0 0 0 1px rgba(${hexToRgb(accent)}, 0.12) inset`
+          : status === 'done' ? `0 0 30px rgba(52,211,153,0.08)` : 'none',
+        cursor: 'default',
+      }}>
+
+      {/* Cursor spotlight overlay */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
+        borderRadius: 16,
+        background: hovered
+          ? `radial-gradient(circle 180px at ${mousePos.x}% ${mousePos.y}%, rgba(${hexToRgb(accent)}, 0.1) 0%, transparent 80%)`
+          : 'transparent',
+        transition: hovered ? 'background 0.08s linear' : 'background 0.4s ease',
+      }} />
       {/* Top accent line */}
       <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, height: 2,
-        background: status === 'done' ? `linear-gradient(90deg, ${accent}, #34d399)` :
-          status === 'in_progress' ? `linear-gradient(90deg, ${accent}, #fbbf24)` :
-          status === 'review' ? `linear-gradient(90deg, #f72585, #7209b7)` :
-          status === 'skipped' ? '#1e2d45' : 'transparent',
-        opacity: status && status !== 'not_started' ? 1 : 0,
-        transition: 'opacity 0.3s',
+        position: 'absolute', top: 0, left: 0, right: 0, height: 2, zIndex: 1,
+        background: `linear-gradient(90deg, transparent, ${accent}, ${shiftColor(accent)}, transparent)`,
+        backgroundSize: '200% 100%',
+        opacity: hovered ? 1 : (status && status !== 'not_started' ? 0.6 : 0),
+        transition: 'opacity 0.35s',
+        animation: hovered ? 'shimmer 1.6s linear infinite' : 'none',
       }} />
 
       {/* Card Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem', position: 'relative', zIndex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
           <div style={{
             width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center',
@@ -56,6 +82,7 @@ export default function TopicCard({ topic, status, note, rating, subtopicStatuse
             background: `rgba(${hexToRgb(accent)}, 0.1)`,
             border: `1px solid rgba(${hexToRgb(accent)}, 0.25)`,
             flexShrink: 0,
+            transition: 'all 0.3s',
           }}>{topic.icon}</div>
           <div>
             <div style={{ fontWeight: 700, fontSize: '1rem', marginBottom: 3, lineHeight: 1.3 }}>{topic.title}</div>
@@ -70,12 +97,12 @@ export default function TopicCard({ topic, status, note, rating, subtopicStatuse
       </div>
 
       {/* Description */}
-      <div style={{ fontSize: '0.8rem', color: '#64748b', lineHeight: 1.65, fontFamily: 'JetBrains Mono, monospace', fontWeight: 300, marginBottom: '1rem' }}>
+      <div style={{ fontSize: '0.8rem', color: '#64748b', lineHeight: 1.65, fontFamily: 'JetBrains Mono, monospace', fontWeight: 300, marginBottom: '1rem', position: 'relative', zIndex: 1 }}>
         {topic.desc}
       </div>
 
       {/* Subtopic progress */}
-      <div style={{ marginBottom: '1rem' }}>
+      <div style={{ marginBottom: '1rem', position: 'relative', zIndex: 1 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
           <span style={{ fontSize: '0.7rem', color: '#64748b', fontFamily: 'JetBrains Mono, monospace' }}>Subtopics checked</span>
           <span style={{ fontSize: '0.7rem', color: accent, fontFamily: 'JetBrains Mono, monospace' }}>{doneSubtopics}/{topic.subtopics.length}</span>
@@ -86,7 +113,7 @@ export default function TopicCard({ topic, status, note, rating, subtopicStatuse
       </div>
 
       {/* Rating stars */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: '1rem', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 4, marginBottom: '1rem', alignItems: 'center', position: 'relative', zIndex: 1 }}>
         <span style={{ fontSize: '0.65rem', color: '#64748b', fontFamily: 'JetBrains Mono, monospace', marginRight: 4 }}>Confidence:</span>
         {[1,2,3,4,5].map(star => (
           <button key={star} onClick={() => onRatingChange(rating === star ? 0 : star)}
@@ -98,7 +125,7 @@ export default function TopicCard({ topic, status, note, rating, subtopicStatuse
       </div>
 
       {/* Action buttons */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
         <ActionBtn icon="▾" label={expanded ? 'Hide Topics' : 'Subtopics'} accent={accent} onClick={() => setExpanded(!expanded)} active={expanded} />
         <ActionBtn icon="📝" label={note ? 'Edit Note' : 'Add Note'} accent="#fbbf24" onClick={() => setShowNotes(!showNotes)} active={!!note} />
         {topic.resources?.length > 0 && <ActionBtn icon="📚" label="Resources" accent="#7209b7" onClick={() => setExpanded(true)} />}
@@ -171,13 +198,18 @@ export default function TopicCard({ topic, status, note, rating, subtopicStatuse
 }
 
 function StatusButton({ status, currentStatus, onClick }) {
+  const [hover, setHover] = useState(false);
   return (
     <button onClick={onClick} title="Click to cycle status"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
       style={{
-        padding: '5px 12px', borderRadius: 100, border: `1px solid ${currentStatus.border}`,
-        background: currentStatus.bg, color: currentStatus.color,
+        padding: '5px 12px', borderRadius: 100,
+        border: `1px solid ${hover ? currentStatus.color : currentStatus.border}`,
+        background: hover ? currentStatus.color + '22' : currentStatus.bg,
+        color: currentStatus.color,
         fontFamily: 'JetBrains Mono, monospace', fontSize: '0.68rem',
-        cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s',
+        cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.25s',
         display: 'flex', alignItems: 'center', gap: 5, fontWeight: 600,
         flexShrink: 0,
       }}>
