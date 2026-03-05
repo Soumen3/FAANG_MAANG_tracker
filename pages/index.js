@@ -36,7 +36,7 @@ const BRANDS = [
 // ── getServerSideProps: read the JSON file on the server before page loads ───
 // This means the page arrives pre-filled — no loading spinner needed
 export async function getServerSideProps() {
-  const initialData = readData();
+  const initialData = await readData();
   return { props: { initialData } };
 }
 

@@ -1,14 +1,14 @@
 import { readData, writeData } from '../../../lib/db';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   try {
-    const data = readData();
+    const data = await readData();
 
     // POST — add new problem
     if (req.method === 'POST') {
       const problem = { ...req.body, id: Date.now() };
       data.problems = [problem, ...data.problems];
-      writeData(data);
+      await writeData(data);
       return res.status(200).json({ ok: true, problem });
     }
 
@@ -18,7 +18,7 @@ export default function handler(req, res) {
       data.problems = data.problems.map(p =>
         p.id === Number(id) ? { ...p, ...changes } : p
       );
-      writeData(data);
+      await writeData(data);
       return res.status(200).json({ ok: true });
     }
 
@@ -26,7 +26,7 @@ export default function handler(req, res) {
     if (req.method === 'DELETE') {
       const { id } = req.body;
       data.problems = data.problems.filter(p => p.id !== Number(id));
-      writeData(data);
+      await writeData(data);
       return res.status(200).json({ ok: true });
     }
 

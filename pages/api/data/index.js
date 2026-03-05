@@ -6,14 +6,14 @@ const EMPTY = {
   meta: { lastUpdated: null, version: '1.0.0' },
 };
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
-      return res.status(200).json(readData());
+      return res.status(200).json(await readData());
     }
     if (req.method === 'POST' && req.body?.action === 'reset') {
       const fresh = { ...EMPTY, meta: { lastUpdated: new Date().toISOString(), version: '1.0.0' } };
-      writeData(fresh);
+      await writeData(fresh);
       return res.status(200).json(fresh);
     }
     res.setHeader('Allow', ['GET', 'POST']);

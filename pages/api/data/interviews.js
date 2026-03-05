@@ -1,13 +1,13 @@
 import { readData, writeData } from '../../../lib/db';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   try {
-    const data = readData();
+    const data = await readData();
 
     if (req.method === 'POST') {
       const interview = { ...req.body, id: Date.now() };
       data.interviews = [interview, ...data.interviews];
-      writeData(data);
+      await writeData(data);
       return res.status(200).json({ ok: true, interview });
     }
 
@@ -16,14 +16,14 @@ export default function handler(req, res) {
       data.interviews = data.interviews.map(i =>
         i.id === Number(id) ? { ...i, ...changes } : i
       );
-      writeData(data);
+      await writeData(data);
       return res.status(200).json({ ok: true });
     }
 
     if (req.method === 'DELETE') {
       const { id } = req.body;
       data.interviews = data.interviews.filter(i => i.id !== Number(id));
-      writeData(data);
+      await writeData(data);
       return res.status(200).json({ ok: true });
     }
 
