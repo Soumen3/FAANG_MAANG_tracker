@@ -48,6 +48,12 @@ export default function Home({ initialData }) {
   const [menuOpen,     setMenuOpen]     = useState(false);
   const [isMobile,     setIsMobile]     = useState(false);
 
+  // ── Gate auth ────────────────────────────────────────────────────────────
+  const [gatePass,  setGatePass]  = useState(null);   // null = checking
+  const [gateName,  setGateName]  = useState('');
+  const [gateError, setGateError] = useState(false);
+  const [gateShake, setGateShake] = useState(false);
+
   const {
     statuses, notes, ratings, subtopicStatuses, timelineChecked,
     problems, interviews, meta, saveStatus,
@@ -70,6 +76,22 @@ export default function Home({ initialData }) {
     return () => window.removeEventListener('resize', check);
   }, []);
 
+  useEffect(() => {
+    setGatePass(sessionStorage.getItem('mamaa_gate') === '1');
+  }, []);
+
+  const handleGateSubmit = (e) => {
+    e.preventDefault();
+    if (gateName.trim().toLowerCase() === 'soumen') {
+      sessionStorage.setItem('mamaa_gate', '1');
+      setGatePass(true);
+    } else {
+      setGateError(true);
+      setGateShake(true);
+      setTimeout(() => setGateShake(false), 600);
+    }
+  };
+
   // Client-side only time string — avoids server/client toLocaleTimeString mismatch
   const [formattedTime, setFormattedTime] = useState('');
   useEffect(() => {
@@ -89,6 +111,142 @@ export default function Home({ initialData }) {
     error:  { label: '✕ Error',   color: '#f87171' },
   }[saveStatus];
 
+  // ── Gate: still checking sessionStorage ───────────────────────────────
+  if (gatePass === null) return null;
+
+  // ── Gate: name prompt ───────────────────────────────────────────────────
+  if (!gatePass) return (
+    <>
+      <Head>
+        <title>MAMAA Tracker — Access</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+      <style>{`
+        @keyframes gateShake {
+          0%,100% { transform: translateX(0); }
+          20%     { transform: translateX(-8px); }
+          40%     { transform: translateX(8px); }
+          60%     { transform: translateX(-6px); }
+          80%     { transform: translateX(6px); }
+        }
+        @keyframes gateFadeIn {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        body { background: #020408; margin: 0; }
+      `}</style>
+
+      {/* bg grid */}
+      <div style={{ position: 'fixed', inset: 0, backgroundImage: 'linear-gradient(rgba(0,245,212,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,212,0.025) 1px,transparent 1px)', backgroundSize: '60px 60px', pointerEvents: 'none' }} />
+      <div style={{ position: 'fixed', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle,rgba(0,245,212,0.05) 0%,transparent 70%)', top: -200, left: -200, pointerEvents: 'none' }} />
+      <div style={{ position: 'fixed', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle,rgba(67,97,238,0.06) 0%,transparent 70%)', bottom: -150, right: -150, pointerEvents: 'none' }} />
+
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', position: 'relative', zIndex: 1 }}>
+        <div style={
+          Object.assign(
+            { background: 'rgba(6,10,20,0.9)', border: '1px solid #16243a', borderRadius: 20,
+              padding: 'clamp(2rem,5vw,3rem)', width: '100%', maxWidth: 420,
+              boxShadow: '0 0 60px rgba(0,245,212,0.06), 0 0 0 1px rgba(22,36,58,0.5)',
+              animation: 'gateFadeIn 0.5s ease both' },
+            gateShake ? { animation: 'gateShake 0.5s ease' } : {}
+          )
+        }>
+          {/* logo mark */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '2rem' }}>
+            <span style={
+              { display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                width: 36, height: 36, borderRadius: 10,
+                background: 'linear-gradient(135deg,#00f5d4 0%,#4361ee 100%)',
+                fontSize: '0.9rem', fontWeight: 900, color: '#020408',
+                fontFamily: 'Syne, sans-serif', flexShrink: 0 }
+            }>M</span>
+            <div>
+              <div style={{ fontWeight: 900, fontSize: '1.1rem', letterSpacing: '0.06em',
+                background: 'linear-gradient(90deg,#00f5d4,#4361ee)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                fontFamily: 'Syne, sans-serif' }}>MAMAA</div>
+              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.5rem', color: '#374151', letterSpacing: '0.14em' }}>TRACKER_v2</div>
+            </div>
+          </div>
+
+          {/* heading */}
+          <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem', color: '#00f5d4',
+            letterSpacing: '0.14em', marginBottom: '0.5rem',
+            display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#00f5d4',
+              display: 'inline-block', animation: 'pulse 1.5s ease infinite' }} />
+            IDENTITY_CHECK
+          </div>
+          <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(1.3rem,4vw,1.7rem)',
+            color: '#e2e8f0', margin: '0 0 0.4rem', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+            Who are you?
+          </h2>
+          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem', color: '#475569',
+            marginBottom: '1.75rem', lineHeight: 1.7, margin: '0 0 1.75rem' }}>
+            Enter your name to access the tracker.
+          </p>
+
+          {/* form */}
+          <form onSubmit={handleGateSubmit}>
+            <div style={{ position: 'relative', marginBottom: '0.875rem' }}>
+              <input
+                autoFocus
+                value={gateName}
+                onChange={e => { setGateName(e.target.value); setGateError(false); }}
+                placeholder="Enter your name…"
+                style={{ width: '100%', boxSizing: 'border-box',
+                  padding: '11px 14px', borderRadius: 10,
+                  background: 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${gateError ? '#f87171' : '#16243a'}`,
+                  color: '#e2e8f0', fontSize: '0.9rem',
+                  fontFamily: 'Syne, sans-serif', outline: 'none',
+                  transition: 'border-color 0.2s',
+                  boxShadow: gateError ? '0 0 12px rgba(248,113,113,0.15)' : 'none' }}
+                onFocus={e => { if (!gateError) e.target.style.borderColor = 'rgba(0,245,212,0.4)'; }}
+                onBlur={e => { if (!gateError) e.target.style.borderColor = '#16243a'; }}
+              />
+            </div>
+
+            {/* error message */}
+            {gateError && (
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8,
+                background: 'rgba(248,113,113,0.06)', border: '1px solid rgba(248,113,113,0.25)',
+                borderRadius: 10, padding: '10px 14px', marginBottom: '0.875rem' }}>
+                <span style={{ fontSize: '1rem', lineHeight: 1, flexShrink: 0, marginTop: 1 }}>🚫</span>
+                <div>
+                  <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: '0.82rem', color: '#f87171', marginBottom: 2 }}>
+                    Access Denied
+                  </div>
+                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.68rem', color: '#64748b', lineHeight: 1.5 }}>
+                    This website is not for you.
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <button type="submit" style={{ width: '100%', padding: '11px',
+              background: 'linear-gradient(90deg,#00f5d4,#4361ee)',
+              border: 'none', borderRadius: 10, cursor: 'pointer',
+              color: '#020408', fontFamily: 'Syne, sans-serif',
+              fontWeight: 800, fontSize: '0.85rem', letterSpacing: '0.08em',
+              transition: 'opacity 0.18s' }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+              ENTER →
+            </button>
+          </form>
+
+          <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.58rem',
+            color: '#2a3a52', textAlign: 'center', marginTop: '1.25rem' }}>
+            // private tracker — authorised users only
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  // ── Main app ─────────────────────────────────────────────────────────────
   return (
     <>
       <Head>
